@@ -1,0 +1,25 @@
+modLoader="javafml"
+loaderVersion="[33,)"
+license="MIT License"
+[[mods]]
+modId="speakermod"
+version="${file.jarVersion}"
+displayName="SpeakerMod"
+displayURL="https://www.curseforge.com/minecraft/mc-mods/speakermod"
+updateJSONURL="https://github.com/mactso/SpeakerMod/raw/main/update.json"
+logoFile="Logo.png"
+authors="MacTso, Lupicus"
+description='Speaker Mod.'
+[[dependencies.speakermod]]
+    modId="forge"
+    mandatory=true
+    versionRange="[33,)"
+    ordering="NONE"
+    side="SERVER"
+
+[[dependencies.speakermod]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.16.2,1.17.0)"
+    ordering="NONE"
+    side="SERVER"
