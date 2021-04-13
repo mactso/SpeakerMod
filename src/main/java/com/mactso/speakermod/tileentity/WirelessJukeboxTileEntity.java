@@ -20,6 +20,7 @@ import net.minecraft.util.math.BlockPos;
 public class WirelessJukeboxTileEntity extends TileEntity implements ITickableTileEntity {
 	List<BlockPos> speakers = new ArrayList<>();
 	int discId = 0;
+	boolean needsSave = false;
 	
 	public WirelessJukeboxTileEntity() {
 	      super(ModTileEntities.WIRELESS_JUKEBOX);
@@ -27,6 +28,8 @@ public class WirelessJukeboxTileEntity extends TileEntity implements ITickableTi
 	
 	public boolean addSpeakerPos (BlockPos pos) {
 		int x = speakers.size();
+		speakers.remove(pos); // ensure speaker pos not already in list
+		speakers.remove(pos);
 		if (speakers.size() < 3) {
 			MyConfig.debugMsg(0, pos, "Adding Speaker");
 			speakers.add(pos);
@@ -34,6 +37,8 @@ public class WirelessJukeboxTileEntity extends TileEntity implements ITickableTi
 			world.playSound(null, pos, SoundEvents.BLOCK_CAMPFIRE_CRACKLE, SoundCategory.BLOCKS, 0.6f, 0.3f);
 			return false;
 		}
+		this.needsSave = true;
+		
 		return true;
 	}
 
@@ -75,25 +80,32 @@ public class WirelessJukeboxTileEntity extends TileEntity implements ITickableTi
 	@Override
 	// restore state when chunk reloads
 	public void read(BlockState state, CompoundNBT compound) {
+		int x,y,z;
 		
 		super.read(state, compound);
 
 		MyConfig.debugMsg(0, "Restoring Speakers");
 		speakers.clear();
-		if (compound.hasUniqueId("spkr0x") && compound.hasUniqueId("spkr0y") && compound.hasUniqueId("spkr0z") ) {
-			BlockPos speakerPos = new BlockPos (compound.getInt("spkr0x"),compound.getInt("spkr0y"),compound.getInt("spkr0z"));
-			speakers.add(speakerPos);
-			MyConfig.debugMsg(0, speakerPos, "Restoring Speakers");
+		x = compound.getInt("spkr0x");
+		y = compound.getInt("spkr0y");
+		z = compound.getInt("spkr0z");
+		BlockPos speakerPos = new BlockPos (x,y,z);
+		if (!speakerPos.equals(BlockPos.ZERO)) {
+			addSpeakerPos (speakerPos);
 		}
-		if (compound.hasUniqueId("spkr1x") && compound.hasUniqueId("spkr1y") && compound.hasUniqueId("spkr1y") ) {
-			BlockPos speakerPos = new BlockPos (compound.getInt("spkr1x"),compound.getInt("spkr1y"),compound.getInt("spkr1z"));
-			speakers.add(speakerPos);
-			MyConfig.debugMsg(0, "Restoring Speakers");
+		x = compound.getInt("spkr1x");
+		y = compound.getInt("spkr1y");
+		z = compound.getInt("spkr1z");
+		speakerPos = new BlockPos (x,y,z);
+		if (!speakerPos.equals(BlockPos.ZERO)) {
+			addSpeakerPos (speakerPos);
 		}
-		if (compound.hasUniqueId("spkr2x") && compound.hasUniqueId("spkr2y") && compound.hasUniqueId("spkr2z") ) {
-			BlockPos speakerPos = new BlockPos (compound.getInt("spkr2x"),compound.getInt("spkr2y"),compound.getInt("spkr2z"));
-			speakers.add(speakerPos);
-			MyConfig.debugMsg(0, "Restoring Speakers");
+		x = compound.getInt("spkr2x");
+		y = compound.getInt("spkr2y");
+		z = compound.getInt("spkr2z");
+		speakerPos = new BlockPos (x,y,z);
+		if (!speakerPos.equals(BlockPos.ZERO)) {
+			addSpeakerPos (speakerPos);
 		}
 
 	}
@@ -130,6 +142,7 @@ public class WirelessJukeboxTileEntity extends TileEntity implements ITickableTi
 	
 	@Override
 	public void tick() {
+
 		if (discId >= 1 && discId<=13) {
 			if (world.getGameTime()%24000 == 1010) {
 				if (world.getBlockState(this.pos.down()).getBlock() == Blocks.GLOWSTONE ) {
@@ -145,6 +158,10 @@ public class WirelessJukeboxTileEntity extends TileEntity implements ITickableTi
 			}
 		}
 
+		if (needsSave) {
+			this.markDirty();
+			needsSave = false;
+		}
 	}
 	
 }
