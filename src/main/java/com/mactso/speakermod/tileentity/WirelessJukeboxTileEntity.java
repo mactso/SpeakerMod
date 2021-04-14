@@ -47,7 +47,7 @@ public class WirelessJukeboxTileEntity extends TileEntity implements ITickableTi
 	// this sucks and I should redo with something like https://forums.minecraftforge.net/topic/60302-any-solved-saving-nbt-data/
 	
 	public CompoundNBT write(CompoundNBT compound) {
-
+		// from jukeboxblock code ...  CompoundNBT compoundnbt = stack.getOrCreateTag();
 		MyConfig.debugMsg(0, pos, "Saving Speakers");
 		if (speakers.size() > 0) {
 

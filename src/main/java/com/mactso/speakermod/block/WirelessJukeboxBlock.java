@@ -23,6 +23,7 @@ import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 
@@ -56,7 +57,7 @@ public class WirelessJukeboxBlock extends JukeboxBlock {
             	WirelessJukeboxTileEntity wJTE = (WirelessJukeboxTileEntity)tileentity;	  
     			if (stack.getItem() == ModItems.WIRELESS_SPEAKER) {
     				String jukeboxPos = "( " + pos.getX() + ", "+ pos.getY() + ", "+ pos.getZ() + " )";
-    				stack.setDisplayName(ITextComponent.getTextComponentOrEmpty(jukeboxPos));
+     				stack.setDisplayName(new StringTextComponent(jukeboxPos));
     				worldIn.playSound(null, pos, SoundEvents.ENTITY_ENDER_EYE_DEATH, SoundCategory.BLOCKS, 0.6f, 0.6f);
     			} else if (stack.getItem() instanceof MusicDiscItem) {
     				worldIn.playEvent((PlayerEntity)null, 1010, pos, discId);
@@ -90,7 +91,7 @@ public class WirelessJukeboxBlock extends JukeboxBlock {
 
 	@Override
 	public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
-
+// from jukeboxblock	      CompoundNBT compoundnbt = stack.getOrCreateTag();
 		worldIn.playSound(null, pos, SoundEvents.ENTITY_ENDER_EYE_DEATH, SoundCategory.BLOCKS, 0.5f, 0.2f);
 		
 	}
