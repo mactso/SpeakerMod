@@ -92,7 +92,7 @@ public class WirelessJukeboxBlock extends JukeboxBlock {
 	@Override
 	public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
 // from jukeboxblock	      CompoundNBT compoundnbt = stack.getOrCreateTag();
-		worldIn.playSound(null, pos, SoundEvents.ENTITY_ENDER_EYE_DEATH, SoundCategory.BLOCKS, 0.5f, 0.2f);
+
 		
 	}
 	

@@ -32,10 +32,9 @@ public class WirelessJukeboxTileEntity extends TileEntity implements ITickableTi
 		speakers.remove(pos); // ensure speaker pos not already in list
 		speakers.remove(pos);
 		if (speakers.size() < 3) {
-			MyConfig.debugMsg(0, pos, "Adding Speaker");
+			MyConfig.debugMsg(0, pos, "JukeBox Adding Speaker");
 			speakers.add(pos);
 		} else {
-			world.playSound(null, pos, SoundEvents.BLOCK_CAMPFIRE_CRACKLE, SoundCategory.BLOCKS, 0.6f, 0.3f);
 			return false;
 		}
 		this.needsSave = true;
@@ -49,28 +48,28 @@ public class WirelessJukeboxTileEntity extends TileEntity implements ITickableTi
 	
 	public CompoundNBT write(CompoundNBT compound) {
 		// from jukeboxblock code ...  CompoundNBT compoundnbt = stack.getOrCreateTag();
-		MyConfig.debugMsg(0, pos, "Saving Speakers");
+		MyConfig.debugMsg(0, pos, "Jukebox Saving Speakers");
 		if (speakers.size() > 0) {
 
 			if (speakers.size()>0) {
 				compound.putInt("spkr0x", speakers.get(0).getX());
 				compound.putInt("spkr0y", speakers.get(0).getY());
 				compound.putInt("spkr0z", speakers.get(0).getZ());
-				MyConfig.debugMsg(0, speakers.get(0), "Saving Speaker");
+				MyConfig.debugMsg(0, speakers.get(0), "Saving a Speaker");
 			}
 	
 			if (speakers.size()>1) {
 				compound.putInt("spkr1x", speakers.get(1).getX());
 				compound.putInt("spkr1y", speakers.get(1).getY());
 				compound.putInt("spkr1z", speakers.get(1).getZ());
-				MyConfig.debugMsg(0, speakers.get(1), "Saving Speaker");
+				MyConfig.debugMsg(0, speakers.get(1), "Saving a Speaker");
 			}
 	
 			if (speakers.size() > 2) {
 				compound.putInt("spkr2x", speakers.get(2).getX());
 				compound.putInt("spkr2y", speakers.get(2).getY());
 				compound.putInt("spkr2z", speakers.get(2).getZ());
-				MyConfig.debugMsg(0, speakers.get(2), "Saving Speaker");
+				MyConfig.debugMsg(0, speakers.get(2), "Saving aSpeaker");
 			}
 
 		}
@@ -87,26 +86,32 @@ public class WirelessJukeboxTileEntity extends TileEntity implements ITickableTi
 
 		MyConfig.debugMsg(0, "Restoring Speakers");
 		speakers.clear();
+
 		x = compound.getInt("spkr0x");
 		y = compound.getInt("spkr0y");
 		z = compound.getInt("spkr0z");
 		BlockPos speakerPos = new BlockPos (x,y,z);
 		if (!speakerPos.equals(BlockPos.ZERO)) {
 			addSpeakerPos (speakerPos);
+			MyConfig.debugMsg(0, speakerPos, "Restoring Speaker");
 		}
+
 		x = compound.getInt("spkr1x");
 		y = compound.getInt("spkr1y");
 		z = compound.getInt("spkr1z");
 		speakerPos = new BlockPos (x,y,z);
 		if (!speakerPos.equals(BlockPos.ZERO)) {
 			addSpeakerPos (speakerPos);
+			MyConfig.debugMsg(0, speakerPos, "Restoring Speaker");
 		}
+
 		x = compound.getInt("spkr2x");
 		y = compound.getInt("spkr2y");
 		z = compound.getInt("spkr2z");
 		speakerPos = new BlockPos (x,y,z);
 		if (!speakerPos.equals(BlockPos.ZERO)) {
 			addSpeakerPos (speakerPos);
+			MyConfig.debugMsg(0, speakerPos, "Restoring Speaker");
 		}
 
 	}

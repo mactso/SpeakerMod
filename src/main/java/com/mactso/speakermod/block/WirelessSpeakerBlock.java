@@ -31,6 +31,7 @@ public class WirelessSpeakerBlock extends Block {
 		
 		if (!(jukeLinkedPos.substring(0,1).equals("("))) {
 			worldIn.playSound(null, pos, SoundEvents.BLOCK_DISPENSER_FAIL, SoundCategory.BLOCKS, 0.6f, 0.3f);
+			return;
 		}
 		// Trim leading and trailing parenthesis
 		jukeLinkedPos = jukeLinkedPos.substring(0,jukeLinkedPos.length()-1);
@@ -62,6 +63,8 @@ public class WirelessSpeakerBlock extends Block {
 	    if (!state.isIn(newState.getBlock())) {
 	    	worldIn.playEvent(1010, pos, 0);
 	    	super.onReplaced(state, worldIn, pos, newState, isMoving);
+			worldIn.playSound(null, pos, SoundEvents.ENTITY_ENDER_EYE_DEATH, SoundCategory.BLOCKS, 0.5f, 0.2f);
+
 	    }
 	    
 	}
