@@ -41,7 +41,7 @@ public class WirelessJukeboxBlock extends JukeboxBlock {
 	}
 	
 	
-@Override
+	@Override
 	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player,
 			Hand handIn, BlockRayTraceResult hit) {
 	

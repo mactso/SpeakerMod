@@ -9,6 +9,7 @@ import com.mactso.speakermod.config.MyConfig;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.MusicDiscItem;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
@@ -19,7 +20,7 @@ import net.minecraft.util.math.BlockPos;
 
 public class WirelessJukeboxTileEntity extends TileEntity implements ITickableTileEntity {
 	List<BlockPos> speakers = new ArrayList<>();
-	int discId = 0;
+	int discId = -1;
 	boolean needsSave = false;
 	
 	public WirelessJukeboxTileEntity() {
@@ -133,7 +134,7 @@ public class WirelessJukeboxTileEntity extends TileEntity implements ITickableTi
 	}
 
 	public void stopSpeakers () {
-		this.discId = 0;
+		this.discId = -1;
 		for (BlockPos spkPos : speakers) {
 			world.playEvent(1010, spkPos, 0);	
 		}
@@ -143,7 +144,7 @@ public class WirelessJukeboxTileEntity extends TileEntity implements ITickableTi
 	@Override
 	public void tick() {
 
-		if (discId >= 1 && discId<=13) {
+		if (discId != -1) {
 			if (world.getGameTime()%24000 == 1010) {
 				if (world.getBlockState(this.pos.down()).getBlock() == Blocks.GLOWSTONE ) {
 					startSpeakers(discId);
