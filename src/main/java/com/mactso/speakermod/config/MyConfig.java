@@ -18,6 +18,7 @@ import net.minecraftforge.fml.config.ModConfig;
 
 @Mod.EventBusSubscriber(modid = Main.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class MyConfig {
+	@SuppressWarnings("unused")
 	private static final Logger LOGGER = LogManager.getLogger();
 	public static final Common COMMON;
 	public static final ForgeConfigSpec COMMON_SPEC;

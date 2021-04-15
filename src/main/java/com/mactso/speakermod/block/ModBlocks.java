@@ -7,8 +7,8 @@ import net.minecraft.block.material.Material;
 import net.minecraftforge.registries.IForgeRegistry;
 
 public class ModBlocks {
-	public static final Block WIRELESS_JUKEBOX = new WirelessJukeboxBlock(Properties.create(Material.GLASS).hardnessAndResistance(0.2F).sound(SoundType.METAL)).setRegistryName("wireless_jukebox");
-	public static final Block WIRELESS_SPEAKER = new WirelessSpeakerBlock(Properties.create(Material.GLASS).hardnessAndResistance(0.2F).sound(SoundType.METAL)).setRegistryName("wireless_speaker");
+	public static final Block WIRELESS_JUKEBOX = new WirelessJukeboxBlock(Properties.create(Material.GLASS).hardnessAndResistance(0.2F).sound(SoundType.METAL).notSolid()).setRegistryName("wireless_jukebox");
+	public static final Block WIRELESS_SPEAKER = new WirelessSpeakerBlock(Properties.create(Material.GLASS).hardnessAndResistance(0.2F).sound(SoundType.METAL).notSolid()).setRegistryName("wireless_speaker");
 
 	public static void register(IForgeRegistry<Block> forgeRegistry	)
 	{
