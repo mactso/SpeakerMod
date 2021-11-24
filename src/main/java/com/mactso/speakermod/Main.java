@@ -1,24 +1,21 @@
 package com.mactso.speakermod;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import com.mactso.speakermod.block.ModBlocks;
 import com.mactso.speakermod.config.MyConfig;
 import com.mactso.speakermod.item.ModItems;
 import com.mactso.speakermod.tileentity.ModTileEntities;
 
-import net.minecraft.block.Block;
-import net.minecraft.item.Item;
-import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.ExtensionPoint;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.network.FMLNetworkConstants;
+
 
 @Mod("speakermod")
 public class Main {
@@ -28,8 +25,6 @@ public class Main {
 	    public Main()
 	    {
 	    	System.out.println(MODID + ": Registering Mod.");
-			ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.DISPLAYTEST,
-					() -> Pair.of(() -> FMLNetworkConstants.IGNORESERVERONLY, (a,b) -> true));
 	    	FMLJavaModLoadingContext.get().getModEventBus().register(this);
  	        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON,MyConfig.COMMON_SPEC );
 
@@ -67,7 +62,7 @@ public class Main {
 	    	}
 		    
 		    @SubscribeEvent
-		    public static void onTileEntitiesRegistry(final RegistryEvent.Register<TileEntityType<?>> event)
+		    public static void onTileEntitiesRegistry(final RegistryEvent.Register<BlockEntityType<?>> event)
 		    {
 		        ModTileEntities.register(event.getRegistry());
 		    }

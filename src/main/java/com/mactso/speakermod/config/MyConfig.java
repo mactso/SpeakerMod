@@ -6,15 +6,15 @@ import org.apache.logging.log4j.Logger;
 
 import com.mactso.speakermod.Main;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.Color;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.TextColor;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.IntValue;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.config.ModConfigEvent;
 
 @Mod.EventBusSubscriber(modid = Main.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class MyConfig {
@@ -43,7 +43,7 @@ public class MyConfig {
 	public static int[] duration = {0,185,190,350,190,180,205,100,155,195,255,75,240,155};
 	
 	@SubscribeEvent
-	public static void onModConfigEvent(final ModConfig.ModConfigEvent configEvent) {
+	public static void onModConfigEvent(final ModConfigEvent configEvent) {
 		System.out.println("Wireless Speakers Config Event");
 		if (configEvent.getConfig().getSpec() == MyConfig.COMMON_SPEC) {
 			bakeConfig();
@@ -99,19 +99,19 @@ public class MyConfig {
 	}
 
 	// support for any color chattext
-	public static void sendChat(PlayerEntity p, String chatMessage, Color color) {
-		StringTextComponent component = new StringTextComponent(chatMessage);
-		component.getStyle().setColor(color);
-		p.sendMessage(component, p.getUniqueID());
+	public static void sendChat(Player p, String chatMessage, TextColor color) {
+		TextComponent component = new TextComponent(chatMessage);
+		component.getStyle().withColor(color);
+		p.sendMessage(component, p.getUUID());
 	}
 
 	// support for any color, optionally bold text.
-	public static void sendBoldChat(PlayerEntity p, String chatMessage, Color color) {
-		StringTextComponent component = new StringTextComponent(chatMessage);
+	public static void sendBoldChat(Player p, String chatMessage, TextColor color) {
+		TextComponent component = new TextComponent(chatMessage);
 
-		component.getStyle().setBold(true);
-		component.getStyle().setColor(color);
+		component.getStyle().withBold(true);
+		component.getStyle().withColor(color);
 
-		p.sendMessage(component, p.getUniqueID());
+		p.sendMessage(component, p.getUUID());
 	}
 }

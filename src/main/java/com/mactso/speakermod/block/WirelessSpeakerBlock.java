@@ -5,16 +5,15 @@ import java.util.StringTokenizer;
 
 import com.mactso.speakermod.tileentity.WirelessJukeboxTileEntity;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-
+import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class WirelessSpeakerBlock extends Block {
 
@@ -24,16 +23,16 @@ public class WirelessSpeakerBlock extends Block {
 	}
 
 	@Override
-	public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
+	public void setPlacedBy(Level worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
 		
-		if (worldIn.isRemote()) {
+		if (worldIn.isClientSide()) {
 			return;
 		}
 		BlockPos jukePos = null;
-		String jukeLinkedPos = stack.getDisplayName().getString().toString();
+		String jukeLinkedPos = stack.getHoverName().getString().toString();
 		
 		if (!(jukeLinkedPos.substring(0,1).equals("("))) {
-			worldIn.playSound(null, pos, SoundEvents.BLOCK_DISPENSER_FAIL, SoundCategory.BLOCKS, 0.6f, 0.3f);
+			worldIn.playSound(null, pos, SoundEvents.DISPENSER_FAIL, SoundSource.BLOCKS, 0.6f, 0.3f);
 			return;
 		}
 		// Trim leading and trailing parenthesis
@@ -50,11 +49,11 @@ public class WirelessSpeakerBlock extends Block {
 			// should never happen
 		}
 
-		TileEntity r = worldIn.getTileEntity(jukePos);
+		BlockEntity r = worldIn.getBlockEntity(jukePos);
 		if ((r instanceof WirelessJukeboxTileEntity) && (calcDistance (jukePos, pos) < 8125.0d) && ((WirelessJukeboxTileEntity) r).addSpeakerPos(pos)) {
-			worldIn.playSound(null, pos, SoundEvents.ENTITY_ENDER_EYE_DEATH, SoundCategory.BLOCKS, 0.6f, 0.2f);
+			worldIn.playSound(null, pos, SoundEvents.ENDER_EYE_DEATH, SoundSource.BLOCKS, 0.6f, 0.2f);
 		} else {
-			worldIn.playSound(null, pos, SoundEvents.BLOCK_DISPENSER_FAIL, SoundCategory.BLOCKS, 0.6f, 0.3f);
+			worldIn.playSound(null, pos, SoundEvents.DISPENSER_FAIL, SoundSource.BLOCKS, 0.6f, 0.3f);
 		}
 		
 	}
@@ -71,10 +70,10 @@ public class WirelessSpeakerBlock extends Block {
 	
 	
 	@SuppressWarnings("deprecation")
-	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
-	    if (!state.isIn(newState.getBlock())) {
-	    	worldIn.playEvent(1010, pos, 0);
-	    	super.onReplaced(state, worldIn, pos, newState, isMoving);
+	public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+	    if (!state.is(newState.getBlock())) {
+	    	worldIn.levelEvent(1010, pos, 0);
+	    	super.onRemove(state, worldIn, pos, newState, isMoving);
 	    }
 	}
 

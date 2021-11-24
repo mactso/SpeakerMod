@@ -10,8 +10,8 @@ import net.minecraftforge.client.event.sound.PlayStreamingSourceEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 @Mod.EventBusSubscriber()
 public class StreamingMusicHandler {
@@ -20,14 +20,18 @@ public class StreamingMusicHandler {
 	@SubscribeEvent
 	public static void onStreamingMusicEvent(PlayStreamingSourceEvent event) {
 		Minecraft mc = Minecraft.getInstance();
-		World w = mc.world;
+		Level w = mc.level;
 		
-		BlockPos pos = new BlockPos (event.getSound().getX(),event.getSound().getY(),event.getSound().getZ());
-		MyConfig.debugMsg(1, pos, "Handling PlayStreamingSourceEvent");
+		if (w != null) {
+			BlockPos pos = new BlockPos (event.getSound().getX(),event.getSound().getY(),event.getSound().getZ());
+			MyConfig.debugMsg(1, pos, "Handling PlayStreamingSourceEvent");
 
-		if (w.getBlockState(pos).getBlock() instanceof WirelessJukeboxBlock) {
-			WirelessJukeboxTileEntity wjb = (WirelessJukeboxTileEntity) w.getTileEntity(pos);
-			wjb.setSoundSource(event.getSource());
+			if (w.getBlockState(pos).getBlock() instanceof WirelessJukeboxBlock) {
+				WirelessJukeboxTileEntity wjb = (WirelessJukeboxTileEntity) w.getBlockEntity(pos);
+				wjb.setSoundSource(event.getSource());
+			}
+		
 		}
+		
 	}
 }

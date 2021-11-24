@@ -2,22 +2,22 @@ package com.mactso.speakermod.tileentity;
 
 import com.mactso.speakermod.block.ModBlocks;
 
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.registries.IForgeRegistry;
 
 public class ModTileEntities {
 
-	public static final TileEntityType<WirelessJukeboxTileEntity> WIRELESS_JUKEBOX = create(
-			"wireless_jukebox", TileEntityType.Builder
-					.create(WirelessJukeboxTileEntity::new, ModBlocks.WIRELESS_JUKEBOX).build(null));
+	public static final BlockEntityType<WirelessJukeboxTileEntity> WIRELESS_JUKEBOX = create(
+			"wireless_jukebox", BlockEntityType.Builder
+					.of(WirelessJukeboxTileEntity::new, ModBlocks.WIRELESS_JUKEBOX).build(null));
 
-	public static <T extends TileEntity> TileEntityType<T> create(String key, TileEntityType<T> type) {
+	public static <T extends BlockEntity> BlockEntityType<T> create(String key, BlockEntityType<T> type) {
 		type.setRegistryName(key);
 		return type;
 	}
 
-	public static void register(IForgeRegistry<TileEntityType<?>> forgeRegistry) {
+	public static void register(IForgeRegistry<BlockEntityType<?>> forgeRegistry) {
 		forgeRegistry.register(WIRELESS_JUKEBOX);
 
 	}

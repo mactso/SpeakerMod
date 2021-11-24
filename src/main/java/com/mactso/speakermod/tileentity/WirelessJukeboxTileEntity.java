@@ -7,32 +7,33 @@ import javax.annotation.Nullable;
 
 import com.mactso.speakermod.block.WirelessSpeakerBlock;
 import com.mactso.speakermod.config.MyConfig;
+import com.mojang.blaze3d.audio.Channel;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.client.audio.SoundSource;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.play.server.SPlaySoundEventPacket;
-import net.minecraft.particles.ItemParticleData;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ItemParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.game.ClientboundLevelEventPacket;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
-public class WirelessJukeboxTileEntity extends TileEntity implements ITickableTileEntity {
+public class WirelessJukeboxTileEntity extends BlockEntity  {
+	// DaylightDetectorBlock look at this as example.
 	List<BlockPos> speakers = new ArrayList<>();
-	SoundSource ss = null;
+	Channel ss = null;
 	int discId = -1;
 	boolean needsSave = false;
 	static final ItemStack EMERALD_STACK = new ItemStack(Items.EMERALD, 1);
-	static final ItemParticleData EMERALD_PARTICLE = new ItemParticleData(ParticleTypes.ITEM, EMERALD_STACK);
+	static final ItemParticleOption EMERALD_PARTICLE = new ItemParticleOption(ParticleTypes.ITEM, EMERALD_STACK);
 	
-	public WirelessJukeboxTileEntity() {
-	      super(ModTileEntities.WIRELESS_JUKEBOX);
+	public WirelessJukeboxTileEntity(BlockPos worldPosition, BlockState blockState) {
+	      super(ModTileEntities.WIRELESS_JUKEBOX, worldPosition, blockState);
 	}
 
 	public int getDiscId ( ) {
@@ -57,7 +58,7 @@ public class WirelessJukeboxTileEntity extends TileEntity implements ITickableTi
 	public void doSpeakerValidation() {
 		List<BlockPos> badSpeakers = new ArrayList<>();
 		for (BlockPos spkPos : speakers) {
-			if (!(world.getBlockState(spkPos).getBlock() instanceof WirelessSpeakerBlock)) {
+			if (!(level.getBlockState(spkPos).getBlock() instanceof WirelessSpeakerBlock)) {
 				badSpeakers.add(spkPos);
 			}
 		}
@@ -68,9 +69,9 @@ public class WirelessJukeboxTileEntity extends TileEntity implements ITickableTi
 	// save state when chunk unloads
 	// this sucks and I should redo with something like https://forums.minecraftforge.net/topic/60302-any-solved-saving-nbt-data/
 	
-	public CompoundNBT write(CompoundNBT compound) {
+	public CompoundTag save(CompoundTag compound) {
 		// from jukeboxblock code ...  CompoundNBT compoundnbt = stack.getOrCreateTag();
-		MyConfig.debugMsg(1, pos, "Jukebox Saving Speakers");
+		MyConfig.debugMsg(1, worldPosition, "Jukebox Saving Speakers");
 		if (speakers.size() > 0) {
 
 			if (speakers.size()>0) {
@@ -97,15 +98,15 @@ public class WirelessJukeboxTileEntity extends TileEntity implements ITickableTi
 		}
 		
 		compound.putInt("discId", this.discId);
-		return super.write(compound);
+		return super.save(compound);
 	}
 	
-	@Override
+
 	// restore state when chunk reloads
-	public void read(BlockState state, CompoundNBT compound) {
+	@Override
+	public void load(CompoundTag compound) {
 		int x,y,z;
-		
-		super.read(state, compound);
+		super.load(compound);
 
 		MyConfig.debugMsg(1, "Restoring Speakers");
 		speakers.clear();
@@ -141,8 +142,8 @@ public class WirelessJukeboxTileEntity extends TileEntity implements ITickableTi
 
 	}
 	
-	public void playEvent(ServerWorld sw, @Nullable PlayerEntity player, int type, BlockPos pos, int data) {
-	      sw.getServer().getPlayerList().sendToAllNearExcept(player, (double)pos.getX(), (double)pos.getY(), (double)pos.getZ(), 96.0D, sw.getDimensionKey(), new SPlaySoundEventPacket(type, pos, data, false));
+	public void playEvent(ServerLevel sw, @Nullable Player player, int type, BlockPos pos, int data) {
+	      sw.getServer().getPlayerList().broadcast(player, (double)pos.getX(), (double)pos.getY(), (double)pos.getZ(), 96.0D, sw.dimension(), new ClientboundLevelEventPacket(type, pos, data, false));
 	   }
 	
 	// starts speakers and validates they are still in place.
@@ -153,7 +154,7 @@ public class WirelessJukeboxTileEntity extends TileEntity implements ITickableTi
 		if (speakers.size() > 0) {
 			for (BlockPos spkPos : speakers) {
 				MyConfig.debugMsg(1, spkPos, "Start Song at Speaker");
-				playEvent((ServerWorld) world, (PlayerEntity) null, 1010, spkPos, discId);
+				playEvent((ServerLevel) level, (Player) null, 1010, spkPos, discId);
 			}
 		}
 	}
@@ -199,49 +200,52 @@ public class WirelessJukeboxTileEntity extends TileEntity implements ITickableTi
 		this.ss = null;
 		
 		for (BlockPos spkPos : speakers) {
-			playEvent((ServerWorld) world, (PlayerEntity) null, 1010, spkPos, discId);
+			playEvent((ServerLevel) level, (Player) null, 1010, spkPos, discId);
 		}
 	}
 	
+	public static void serverTick(Level level, BlockPos pos, BlockState state, WirelessJukeboxTileEntity blockEntity) {
+		blockEntity.realServerTick();
+	}
 	
-	@Override
-	public void tick() {
+
+	public void realServerTick() {
+
+		long timer = level.getGameTime()%20;
 		
-		long timer = world.getGameTime()%20;
-		
-		// NOTE this is on the client side)
+		// NOTE this is on the client side)  // remove test on ticker
 		if (this.ss != null) {
-			if (ss.isStopped()) {
-				MyConfig.debugMsg(1, pos, "Sound Event Stopped");
+			if (ss.stopped()) {
+				MyConfig.debugMsg(1, worldPosition, "Sound Event Stopped");
 				ss=null;
 			} else if (timer == 1) {
 //				doLightShow();
 			}
 		}
 
-		if ((discId != -1) && !(world.isRemote)) {
-			long gameTime = world.getDayTime() % 24000;
+		if ((discId != -1) && !(level.isClientSide)) {
+			long gameTime = level.getDayTime() % 24000;
 
 			if (gameTime == 1001) {
-				if (world.getBlockState(this.pos.down()).getBlock() == Blocks.GLOWSTONE ) {
+				if (level.getBlockState(this.worldPosition.below()).getBlock() == Blocks.GLOWSTONE ) {
 					startSpeakers(discId);
-					this.playEvent((ServerWorld) world, (PlayerEntity) null, 1010, pos, discId);
+					this.playEvent((ServerLevel) level, (Player) null, 1010, worldPosition, discId);
 				}
 			}
 			if (gameTime == 13001) {
-				if (world.getBlockState(this.pos.down()).getBlock() == Blocks.COAL_BLOCK ) {
+				if (level.getBlockState(this.worldPosition.below()).getBlock() == Blocks.COAL_BLOCK ) {
 					startSpeakers(discId);
-					this.playEvent((ServerWorld) world, (PlayerEntity) null, 1010, pos, discId);				}
+					this.playEvent((ServerLevel) level, (Player) null, 1010, worldPosition, discId);				}
 			}
 		}
 
 		if (needsSave) {
-			this.markDirty();
+			this.setChanged();
 			needsSave = false;
 		}
 	}
 
-	public void setSoundSource(SoundSource source) {
+	public void setSoundSource(Channel source) {
 		this.ss = source;
 	}
 
