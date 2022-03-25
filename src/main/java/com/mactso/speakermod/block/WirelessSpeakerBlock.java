@@ -3,6 +3,7 @@ package com.mactso.speakermod.block;
 
 import java.util.StringTokenizer;
 
+import com.mactso.speakermod.config.MyConfig;
 import com.mactso.speakermod.tileentity.WirelessJukeboxTileEntity;
 
 import net.minecraft.core.BlockPos;
@@ -10,6 +11,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -23,6 +25,11 @@ public class WirelessSpeakerBlock extends Block {
 	}
 
 	@Override
+	public int getLightEmission(BlockState state, BlockGetter world, BlockPos pos) {
+	    return MyConfig.getSpeakerLightLevel();
+	}
+
+    @Override
 	public void setPlacedBy(Level worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
 		
 		if (worldIn.isClientSide()) {

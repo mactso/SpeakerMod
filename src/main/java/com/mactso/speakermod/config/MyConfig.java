@@ -31,14 +31,22 @@ public class MyConfig {
 	public static int getDebugLevel() {
 		return debugLevel;
 	}
+	
+	public static int getJukeboxLightLevel() {
+		return jukeboxLightLevel;
+	}
+
+	public static int getSpeakerLightLevel() {
+		return speakerLightLevel;
+	}
 
 	public static void setDebugLevel(int debugLevel) {
 		MyConfig.debugLevel = debugLevel;
 	}
-
-
 	
 	public static int debugLevel;
+	private static int jukeboxLightLevel;
+	private static int speakerLightLevel;
 	// durations of songs by id number (0 is not a disc) for future multiplay
 	public static int[] duration = {0,185,190,350,190,180,205,100,155,195,255,75,240,155};
 	
@@ -60,9 +68,14 @@ public class MyConfig {
 	public static void bakeConfig() {
 		
 		debugLevel = COMMON.debugLevel.get();
+		jukeboxLightLevel = COMMON.jukeboxLightLevel.get();
+		speakerLightLevel = COMMON.speakerLightLevel.get();
 		
 		if (debugLevel > 0) {
 			System.out.println("Wireless Speaker Debug: " + debugLevel);
+			System.out.println("Wireless Jukebox Light: " + jukeboxLightLevel);
+			System.out.println("Wireless Speaker Light: " + speakerLightLevel);
+
 		}
 		
 
@@ -75,12 +88,20 @@ public class MyConfig {
 
 		
 		public final IntValue debugLevel;
+		public final IntValue jukeboxLightLevel;
+		public final IntValue speakerLightLevel;
 		
 		public Common(ForgeConfigSpec.Builder builder) {
-			builder.push("Spawn Biome Utility Control Values");
+			builder.push("Speaker Mod Control Values");
 
 			debugLevel = builder.comment("Debug Level: 0 = Off, 1 = Log, 2 = Chat+Log")
 					.translation(Main.MODID + ".config." + "debugLevel").defineInRange("debugLevel", () -> 0, 0, 2);
+
+			jukeboxLightLevel = builder.comment("Jukebox Light Level 0-15. Overworld Night is 4.")
+					.translation(Main.MODID + ".config." + "jukeboxLightLevel").defineInRange("jukeboxLightLevel", () -> 9, 0, 15);
+
+			speakerLightLevel = builder.comment("Speaker Light Level 0-15. Overworld Night is 4.")
+					.translation(Main.MODID + ".config." + "speakerLightLevel").defineInRange("speakerLightLevel", () -> 6, 0, 15);
 			
 			builder.pop();
 		}

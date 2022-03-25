@@ -28,7 +28,7 @@ public class StreamingMusicHandler {
 
 			if (w.getBlockState(pos).getBlock() instanceof WirelessJukeboxBlock) {
 				WirelessJukeboxTileEntity wjb = (WirelessJukeboxTileEntity) w.getBlockEntity(pos);
-				wjb.setSoundSource(event.getSource());
+				wjb.setSoundSource(event.getChannel());
 			}
 		
 		}
