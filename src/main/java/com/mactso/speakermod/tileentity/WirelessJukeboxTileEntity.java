@@ -1,13 +1,13 @@
 package com.mactso.speakermod.tileentity;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import javax.annotation.Nullable;
 
 import com.mactso.speakermod.block.WirelessSpeakerBlock;
 import com.mactso.speakermod.config.MyConfig;
+import com.mactso.speakermod.init.BlockEntityInit;
 import com.mojang.blaze3d.audio.Channel;
 
 import net.minecraft.core.BlockPos;
@@ -25,10 +25,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DaylightDetectorBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.Property;
 
 public class WirelessJukeboxTileEntity extends BlockEntity  {
 	// DaylightDetectorBlock look at this as example.
@@ -41,7 +37,7 @@ public class WirelessJukeboxTileEntity extends BlockEntity  {
 	static final ItemParticleOption EMERALD_PARTICLE = new ItemParticleOption(ParticleTypes.ITEM, EMERALD_STACK);
 	
 	public WirelessJukeboxTileEntity(BlockPos worldPosition, BlockState blockState) {
-	      super(ModTileEntities.WIRELESS_JUKEBOX, worldPosition, blockState);
+	      super(BlockEntityInit.WIRELESS_JUKEBOX.get(), worldPosition, blockState);
 	}
 
 	public int getDiscId ( ) {

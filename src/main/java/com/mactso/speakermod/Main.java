@@ -1,89 +1,28 @@
 package com.mactso.speakermod;
 
-import com.mactso.speakermod.block.ModBlocks;
 import com.mactso.speakermod.config.MyConfig;
-import com.mactso.speakermod.item.ModItems;
-import com.mactso.speakermod.tileentity.ModTileEntities;
+import com.mactso.speakermod.init.BlockEntityInit;
+import com.mactso.speakermod.init.BlockInit;
 
-import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-
+import org.jetbrains.annotations.NotNull;
 
 @Mod("speakermod")
 public class Main {
 
-	    public static final String MODID = "speakermod"; 
-	    
-	    public Main()
-	    {
-	    	System.out.println(MODID + ": Registering Mod.");
-	    	FMLJavaModLoadingContext.get().getModEventBus().register(this);
- 	        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON,MyConfig.COMMON_SPEC );
+	public static final String MODID = "speakermod";
 
- 	        //   	        ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.DISPLAYTEST, () -> Pair.of(() -> FMLNetworkConstants.IGNORESERVERONLY, (a, b) -> true));
-	    }
-
-
-		@SubscribeEvent 
-		public void preInit (final FMLCommonSetupEvent event) {
-				System.out.println(MODID + ": Registering Handlers");
-//				MinecraftForge.EVENT_BUS.register(new SpawnerBreakEvent ());
-//				MinecraftForge.EVENT_BUS.register(new SpawnEventHandler());
-//				MinecraftForge.EVENT_BUS.register(new MonsterDropEventHandler());
-//				MinecraftForge.EVENT_BUS.register(new ExperienceDropEventHandler());
-//				MinecraftForge.EVENT_BUS.register(new ChunkEvent());
-//				CapabilityChunkLastMobDeathTime.register();
-				//				MinecraftForge.EVENT_BUS.register(new MyEntityPlaceEvent());
-		}   
-
-		@Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
-	    public static class ModEvents
-	    {
-		    @SubscribeEvent
-		    public static void onBlocksRegistry(final RegistryEvent.Register<Block> event)
-		    {
-				System.out.println("SpeakerMod : Register Blocks");
-		    	ModBlocks.register(event.getRegistry());
-		    }
-		    
-	    	@SubscribeEvent
-	    	public static void onItemsRegistry(final RegistryEvent.Register<Item> event)
-	    	{
-				System.out.println("RedStoneMagic: Register Items");
-	    		ModItems.register(event.getRegistry());
-	    	}
-		    
-		    @SubscribeEvent
-		    public static void onTileEntitiesRegistry(final RegistryEvent.Register<BlockEntityType<?>> event)
-		    {
-		        ModTileEntities.register(event.getRegistry());
-		    }
-		    
-		    
-	    }	
-		
-	    @Mod.EventBusSubscriber()
-	    public static class ForgeEvents
-	    {
-//	        @SubscribeEvent
-//	        public static void onServerStarting(FMLServerStartingEvent event)
-//	        {
-//	        	ModEntities.addSpawnData();
-//	        }
-//
-//	        @SubscribeEvent
-//	        public static void onServerStopping(FMLServerStoppingEvent event)
-//	        {
-//	        	ModEntities.removeSpawnData();
-//	        }
-	    }
+	public Main() {
+		System.out.println(MODID + ": Registering Mod.");
+		IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+		BlockInit.BLOCKS.register(bus);
+		BlockEntityInit.BLOCK_ENTITIES.register(bus);
+	}
 
 }
