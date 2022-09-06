@@ -2,6 +2,8 @@ package com.mactso.speakermod.block;
 
 import javax.annotation.Nullable;
 
+import org.jetbrains.annotations.NotNull;
+
 import com.mactso.speakermod.blockentities.WirelessJukeboxBlockEntity;
 import com.mactso.speakermod.config.MyConfig;
 import com.mactso.speakermod.init.BlockEntityInit;
@@ -21,6 +23,7 @@ import net.minecraft.world.item.RecordItem;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.JukeboxBlock;
+import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -36,9 +39,10 @@ public class WirelessJukeboxBlock extends JukeboxBlock {
     
 	}
 
+	@Nullable	
 	@Override
-    public BlockEntity newBlockEntity(BlockPos worldPosition, BlockState blockState) {
-	      return new WirelessJukeboxBlockEntity(worldPosition, blockState);
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState blockState) {
+		return BlockEntityInit.WIRELESS_JUKEBOX.get().create(pos, blockState);
 	}
 	
 	@Override
@@ -53,7 +57,12 @@ public class WirelessJukeboxBlock extends JukeboxBlock {
 	      return level.isClientSide ? null : createTickerHelper(blockEntityType, BlockEntityInit.WIRELESS_JUKEBOX.get(), WirelessJukeboxBlockEntity::serverTick);
 	      // either make two tickers or call it here and check which side in ticker.
 	      //	      return  createTickerHelper(blockEntityType, ModTileEntities.WIRELESS_JUKEBOX, WirelessJukeboxTileEntity::serverTick);
-
+// TurtyWurty code below.  $0?  $1?
+	      //	        return level.isClientSide() ? null : ($0, $1, $2, blockEntity) -> {
+//	            if(blockEntity instanceof CrusherBlockEntity crusher) {
+//	                crusher.tick();
+//	            }
+//	        };
 	}
 
 
