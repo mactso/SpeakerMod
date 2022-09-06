@@ -3,8 +3,8 @@ package com.mactso.speakermod.block;
 
 import java.util.StringTokenizer;
 
+import com.mactso.speakermod.blockentities.WirelessJukeboxBlockEntity;
 import com.mactso.speakermod.config.MyConfig;
-import com.mactso.speakermod.tileentity.WirelessJukeboxTileEntity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
@@ -57,7 +57,7 @@ public class WirelessSpeakerBlock extends Block {
 		}
 
 		BlockEntity r = worldIn.getBlockEntity(jukePos);
-		if ((r instanceof WirelessJukeboxTileEntity) && (calcDistance (jukePos, pos) < 8125.0d) && ((WirelessJukeboxTileEntity) r).addSpeakerPos(pos)) {
+		if ((r instanceof WirelessJukeboxBlockEntity) && (calcDistance (jukePos, pos) < 8125.0d) && ((WirelessJukeboxBlockEntity) r).addSpeakerPos(pos)) {
 			worldIn.playSound(null, pos, SoundEvents.ENDER_EYE_DEATH, SoundSource.BLOCKS, 0.6f, 0.2f);
 		} else {
 			worldIn.playSound(null, pos, SoundEvents.DISPENSER_FAIL, SoundSource.BLOCKS, 0.6f, 0.3f);

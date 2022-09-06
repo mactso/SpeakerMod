@@ -1,4 +1,4 @@
-package com.mactso.speakermod.tileentity;
+package com.mactso.speakermod.blockentities;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +26,7 @@ import net.minecraft.world.level.block.DaylightDetectorBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class WirelessJukeboxTileEntity extends BlockEntity  {
+public class WirelessJukeboxBlockEntity extends BlockEntity  {
 	// DaylightDetectorBlock look at this as example.
 	List<BlockPos> speakers = new ArrayList<>();
 	Channel ss = null;
@@ -36,7 +36,7 @@ public class WirelessJukeboxTileEntity extends BlockEntity  {
 	static final ItemStack EMERALD_STACK = new ItemStack(Items.EMERALD, 1);
 	static final ItemParticleOption EMERALD_PARTICLE = new ItemParticleOption(ParticleTypes.ITEM, EMERALD_STACK);
 	
-	public WirelessJukeboxTileEntity(BlockPos worldPosition, BlockState blockState) {
+	public WirelessJukeboxBlockEntity(BlockPos worldPosition, BlockState blockState) {
 	      super(BlockEntityInit.WIRELESS_JUKEBOX.get(), worldPosition, blockState);
 	}
 
@@ -228,7 +228,7 @@ public class WirelessJukeboxTileEntity extends BlockEntity  {
 		}
 	}
 	
-	public static void serverTick(Level level, BlockPos pos, BlockState state, WirelessJukeboxTileEntity blockEntity) {
+	public static void serverTick(Level level, BlockPos pos, BlockState state, WirelessJukeboxBlockEntity blockEntity) {
 		blockEntity.realServerTick();
 	}
 	

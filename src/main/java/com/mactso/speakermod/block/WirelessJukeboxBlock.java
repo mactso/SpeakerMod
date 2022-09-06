@@ -2,10 +2,10 @@ package com.mactso.speakermod.block;
 
 import javax.annotation.Nullable;
 
+import com.mactso.speakermod.blockentities.WirelessJukeboxBlockEntity;
 import com.mactso.speakermod.config.MyConfig;
 import com.mactso.speakermod.init.BlockEntityInit;
 import com.mactso.speakermod.init.BlockInit;
-import com.mactso.speakermod.tileentity.WirelessJukeboxTileEntity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -38,7 +38,7 @@ public class WirelessJukeboxBlock extends JukeboxBlock {
 
 	@Override
     public BlockEntity newBlockEntity(BlockPos worldPosition, BlockState blockState) {
-	      return new WirelessJukeboxTileEntity(worldPosition, blockState);
+	      return new WirelessJukeboxBlockEntity(worldPosition, blockState);
 	}
 	
 	@Override
@@ -50,7 +50,7 @@ public class WirelessJukeboxBlock extends JukeboxBlock {
 	@Override
 	@Nullable
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState blockState, BlockEntityType<T> blockEntityType) {
-	      return level.isClientSide ? null : createTickerHelper(blockEntityType, BlockEntityInit.WIRELESS_JUKEBOX.get(), WirelessJukeboxTileEntity::serverTick);
+	      return level.isClientSide ? null : createTickerHelper(blockEntityType, BlockEntityInit.WIRELESS_JUKEBOX.get(), WirelessJukeboxBlockEntity::serverTick);
 	      // either make two tickers or call it here and check which side in ticker.
 	      //	      return  createTickerHelper(blockEntityType, ModTileEntities.WIRELESS_JUKEBOX, WirelessJukeboxTileEntity::serverTick);
 
@@ -69,8 +69,8 @@ public class WirelessJukeboxBlock extends JukeboxBlock {
 	
 			//		if ((worldIn instanceof ServerWorld)) { } plays both sides I think.
             BlockEntity tileentity = worldIn.getBlockEntity(pos);
-            if (tileentity instanceof WirelessJukeboxTileEntity) {
-            	WirelessJukeboxTileEntity wJTE = (WirelessJukeboxTileEntity)tileentity;	  
+            if (tileentity instanceof WirelessJukeboxBlockEntity) {
+            	WirelessJukeboxBlockEntity wJTE = (WirelessJukeboxBlockEntity)tileentity;	  
     			if (stack.getItem() == BlockInit.WIRELESS_SPEAKER.get().asItem()) {
     				String jukeboxPos = "( " + pos.getX() + ", "+ pos.getY() + ", "+ pos.getZ() + " )";
      				stack.setHoverName (Component.literal(jukeboxPos));
@@ -100,8 +100,8 @@ public class WirelessJukeboxBlock extends JukeboxBlock {
 	    if (!state.is(newState.getBlock())) {
 	        if (!worldIn.isClientSide) {
 	            BlockEntity tileentity = worldIn.getBlockEntity(pos);
-	            if (tileentity instanceof WirelessJukeboxTileEntity) {
-	            	WirelessJukeboxTileEntity wJTE = (WirelessJukeboxTileEntity)tileentity;	
+	            if (tileentity instanceof WirelessJukeboxBlockEntity) {
+	            	WirelessJukeboxBlockEntity wJTE = (WirelessJukeboxBlockEntity)tileentity;	
 	            	wJTE.playEvent((ServerLevel) worldIn, (Player) null, 1010, pos, 0);
 	    			wJTE.stopSpeakers ();
 	            }

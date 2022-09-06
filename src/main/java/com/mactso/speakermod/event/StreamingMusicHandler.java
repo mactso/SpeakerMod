@@ -1,8 +1,8 @@
 package com.mactso.speakermod.event;
 
 import com.mactso.speakermod.block.WirelessJukeboxBlock;
+import com.mactso.speakermod.blockentities.WirelessJukeboxBlockEntity;
 import com.mactso.speakermod.config.MyConfig;
-import com.mactso.speakermod.tileentity.WirelessJukeboxTileEntity;
 
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -27,7 +27,7 @@ public class StreamingMusicHandler {
 			MyConfig.debugMsg(1, pos, "Handling PlayStreamingSourceEvent");
 
 			if (w.getBlockState(pos).getBlock() instanceof WirelessJukeboxBlock) {
-				WirelessJukeboxTileEntity wjb = (WirelessJukeboxTileEntity) w.getBlockEntity(pos);
+				WirelessJukeboxBlockEntity wjb = (WirelessJukeboxBlockEntity) w.getBlockEntity(pos);
 				wjb.setSoundSource(event.getChannel());
 			}
 		
