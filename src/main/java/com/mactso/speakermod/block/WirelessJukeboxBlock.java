@@ -23,6 +23,7 @@ import net.minecraft.world.item.RecordItem;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.JukeboxBlock;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -33,20 +34,23 @@ import net.minecraft.world.phys.BlockHitResult;
 
 public class WirelessJukeboxBlock extends JukeboxBlock {
 
-	public WirelessJukeboxBlock(BlockBehaviour.Properties builder) {
+	public WirelessJukeboxBlock(BlockBehaviour.Properties properties) {
 
-    super(builder);
+    super(properties);
+	int x = 3;
     
 	}
 
 	@Nullable	
 	@Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState blockState) {
+		int x = 3;
 		return BlockEntityInit.WIRELESS_JUKEBOX.get().create(pos, blockState);
 	}
 	
 	@Override
 	public int getLightEmission(BlockState state, BlockGetter world, BlockPos pos) {
+		int x = 3;
 	    return MyConfig.getJukeboxLightLevel();
 	}
 
@@ -54,7 +58,9 @@ public class WirelessJukeboxBlock extends JukeboxBlock {
 	@Override
 	@Nullable
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState blockState, BlockEntityType<T> blockEntityType) {
-	      return level.isClientSide ? null : createTickerHelper(blockEntityType, BlockEntityInit.WIRELESS_JUKEBOX.get(), WirelessJukeboxBlockEntity::serverTick);
+		int x = 3;
+		return level.isClientSide ? null : 
+	    	  createTickerHelper(blockEntityType, BlockEntityInit.WIRELESS_JUKEBOX.get(), WirelessJukeboxBlockEntity::serverTick);
 	      // either make two tickers or call it here and check which side in ticker.
 	      //	      return  createTickerHelper(blockEntityType, ModTileEntities.WIRELESS_JUKEBOX, WirelessJukeboxTileEntity::serverTick);
 // TurtyWurty code below.  $0?  $1?
@@ -108,9 +114,9 @@ public class WirelessJukeboxBlock extends JukeboxBlock {
 	public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
 	    if (!state.is(newState.getBlock())) {
 	        if (!worldIn.isClientSide) {
-	            BlockEntity tileentity = worldIn.getBlockEntity(pos);
-	            if (tileentity instanceof WirelessJukeboxBlockEntity) {
-	            	WirelessJukeboxBlockEntity wJTE = (WirelessJukeboxBlockEntity)tileentity;	
+	            BlockEntity blockEntity = worldIn.getBlockEntity(pos);
+	            if (blockEntity instanceof WirelessJukeboxBlockEntity) {
+	            	WirelessJukeboxBlockEntity wJTE = (WirelessJukeboxBlockEntity)blockEntity;	
 	            	wJTE.playEvent((ServerLevel) worldIn, (Player) null, 1010, pos, 0);
 	    			wJTE.stopSpeakers ();
 	            }

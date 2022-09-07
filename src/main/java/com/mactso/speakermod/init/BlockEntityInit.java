@@ -13,8 +13,13 @@ public class BlockEntityInit {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, Main.MODID);
 
     public static final RegistryObject<BlockEntityType<WirelessJukeboxBlockEntity>> WIRELESS_JUKEBOX = 
-    		BLOCK_ENTITIES.register("wireless_jukebox",
-            () -> BlockEntityType.Builder.of(WirelessJukeboxBlockEntity::new, BlockInit.WIRELESS_JUKEBOX.get()).build(null));
+    		beExtract();
+
+
+	public static RegistryObject<BlockEntityType<WirelessJukeboxBlockEntity>> beExtract() {
+		return BLOCK_ENTITIES.register("wireless_jukebox",
+		() -> BlockEntityType.Builder.of(WirelessJukeboxBlockEntity::new, BlockInit.WIRELESS_JUKEBOX.get()).build(null));
+	}
 
 
     public static void register (IEventBus eventBus) {

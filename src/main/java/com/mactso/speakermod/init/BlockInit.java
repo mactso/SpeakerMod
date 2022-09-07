@@ -3,6 +3,8 @@ package com.mactso.speakermod.init;
 import java.util.function.Supplier;
 
 import com.mactso.speakermod.Main;
+import com.mactso.speakermod.block.WirelessJukeboxBlock;
+import com.mactso.speakermod.block.WirelessSpeakerBlock;
 
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
@@ -20,13 +22,13 @@ public class BlockInit {
 
 	public static final RegistryObject<Block> WIRELESS_JUKEBOX = register(
 			"wireless_jukebox",
-			() -> new Block(BlockBehaviour.Properties.of(Material.GLASS).strength(0.2F).sound(SoundType.METAL).noOcclusion()),
+			() -> new WirelessJukeboxBlock(BlockBehaviour.Properties.of(Material.GLASS).strength(0.2F).sound(SoundType.METAL).noOcclusion()),
 			new Item.Properties().tab(CreativeModeTab.TAB_REDSTONE)
 			);
 
 	public static final RegistryObject<Block> WIRELESS_SPEAKER = register(
 			"wireless_speaker",
-			() -> new Block(BlockBehaviour.Properties.of(Material.GLASS).strength(0.2F).sound(SoundType.METAL).noOcclusion()),
+			() -> new WirelessSpeakerBlock(BlockBehaviour.Properties.of(Material.GLASS).strength(0.2F).sound(SoundType.METAL).noOcclusion()),
 			new Item.Properties().tab(CreativeModeTab.TAB_REDSTONE)
 			);
 	
