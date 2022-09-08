@@ -2,8 +2,6 @@ package com.mactso.speakermod.block;
 
 import javax.annotation.Nullable;
 
-import org.jetbrains.annotations.NotNull;
-
 import com.mactso.speakermod.blockentities.WirelessJukeboxBlockEntity;
 import com.mactso.speakermod.config.MyConfig;
 import com.mactso.speakermod.init.BlockEntityInit;
@@ -23,8 +21,6 @@ import net.minecraft.world.item.RecordItem;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.JukeboxBlock;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -37,20 +33,19 @@ public class WirelessJukeboxBlock extends JukeboxBlock {
 	public WirelessJukeboxBlock(BlockBehaviour.Properties properties) {
 
     super(properties);
-	int x = 3;
     
 	}
 
 	@Nullable	
 	@Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState blockState) {
-		int x = 3;
+
 		return BlockEntityInit.WIRELESS_JUKEBOX.get().create(pos, blockState);
 	}
 	
 	@Override
 	public int getLightEmission(BlockState state, BlockGetter world, BlockPos pos) {
-		int x = 3;
+
 	    return MyConfig.getJukeboxLightLevel();
 	}
 
@@ -58,7 +53,7 @@ public class WirelessJukeboxBlock extends JukeboxBlock {
 	@Override
 	@Nullable
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState blockState, BlockEntityType<T> blockEntityType) {
-		int x = 3;
+
 		return level.isClientSide ? null : 
 	    	  createTickerHelper(blockEntityType, BlockEntityInit.WIRELESS_JUKEBOX.get(), WirelessJukeboxBlockEntity::serverTick);
 	      // either make two tickers or call it here and check which side in ticker.
