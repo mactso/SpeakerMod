@@ -13,9 +13,11 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 @Mod.EventBusSubscriber(modid = Main.MODID, bus = Bus.MOD)
 public class handleTabSetup {
 
+	// TODO - rename this to HandleTabSetup next time in here.
 	@SubscribeEvent
 	public static void handleTabSetup (CreativeModeTabEvent.BuildContents event)
     {
+		
         if (event.getTab() == CreativeModeTabs.REDSTONE_BLOCKS)
         {
             event.accept(BlockInit.WIRELESS_JUKEBOX);
