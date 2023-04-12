@@ -11,7 +11,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 
 @Mod.EventBusSubscriber(modid = Main.MODID, bus = Bus.MOD)
-public class handleTabSetup {
+public class HandleTabSetup {
 
 	// TODO - rename this to HandleTabSetup next time in here.
 	@SubscribeEvent

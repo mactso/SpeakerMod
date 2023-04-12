@@ -23,7 +23,7 @@ public class StreamingMusicHandler {
 		Level w = mc.level;
 		
 		if (w != null) {
-			BlockPos pos = new BlockPos (event.getSound().getX(),event.getSound().getY(),event.getSound().getZ());
+			BlockPos pos = BlockPos.containing(event.getSound().getX(), event.getSound().getY(), event.getSound().getZ());
 			MyConfig.debugMsg(1, pos, "Handling PlayStreamingSourceEvent");
 
 			if (w.getBlockState(pos).getBlock() instanceof WirelessJukeboxBlock) {
