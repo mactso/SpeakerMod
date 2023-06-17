@@ -13,7 +13,11 @@ description='Speaker Mod.'
 [[dependencies.speakermod]]
     modId="forge"
     mandatory=true
+<<<<<<< HEAD
     versionRange="[46,)"
+=======
+    versionRange="[45,)"
+>>>>>>> branch 'main' of https://github.com/mactso/SpeakerMod
     ordering="NONE"
     side="BOTH"
 
