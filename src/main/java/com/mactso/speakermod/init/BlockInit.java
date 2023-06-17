@@ -10,25 +10,27 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
+import net.minecraft.world.level.material.MapColor;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
 public class BlockInit {
 	public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, Main.MODID);
-
+	public static Block b = Blocks.ACACIA_LEAVES;
 	public static final RegistryObject<Block> WIRELESS_JUKEBOX = register(
 			"wireless_jukebox",
-			() -> new WirelessJukeboxBlock(BlockBehaviour.Properties.of(Material.GLASS).strength(0.2F).sound(SoundType.METAL).noOcclusion()),
+			() -> new WirelessJukeboxBlock(BlockBehaviour.Properties.of().mapColor(MapColor.DIRT).instrument(NoteBlockInstrument.BASS).strength(0.2F).sound(SoundType.METAL).noOcclusion()),
 			new Item.Properties().rarity(Rarity.UNCOMMON)
 			);
 
 	public static final RegistryObject<Block> WIRELESS_SPEAKER = register(
 			"wireless_speaker",
-			() -> new WirelessSpeakerBlock(BlockBehaviour.Properties.of(Material.GLASS).strength(0.2F).sound(SoundType.METAL).noOcclusion()),
+			() -> new WirelessSpeakerBlock(BlockBehaviour.Properties.of().mapColor(MapColor.DIRT).instrument(NoteBlockInstrument.BASS).strength(0.2F).sound(SoundType.METAL).noOcclusion()),
 			new Item.Properties().rarity(Rarity.UNCOMMON)
 			);
 	
