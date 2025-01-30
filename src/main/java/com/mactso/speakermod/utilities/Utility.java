@@ -1,22 +1,24 @@
 package com.mactso.speakermod.utilities;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.mactso.speakermod.config.MyConfig;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.StringTag;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.effect.MobEffect;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.ItemLore;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.Heightmap.Types;
 import net.minecraft.world.phys.Vec3;
@@ -43,28 +45,28 @@ public class Utility {
 
 	public static void debugMsg(int level, String dMsg) {
 
-//		if (MyConfig.getDebugLevel() > level - 1) {
+		if (MyConfig.getDebugLevel() > level - 1) {
 			LOGGER.info("L" + level + ":" + dMsg);
-//		}
+		}
 
 	}
 
 	public static void debugMsg(int level, BlockPos pos, String dMsg) {
 
-//		if (MyConfig.getDebugLevel() > level - 1) {
+		if (MyConfig.getDebugLevel() > level - 1) {
 			LOGGER.info("L" + level + " (" + pos.getX() + "," + pos.getY() + "," + pos.getZ() + "): " + dMsg);
-//		}
+		}
 
 	}
 
 	public static void debugMsg(int level, LivingEntity le, String dMsg) {
 
-//		if (MyConfig.getDebugLevel() > level - 1) {
+		if (MyConfig.getDebugLevel() > level - 1) {
 			LOGGER.info("L" + level + " (" 
 					+ le.blockPosition().getX() + "," 
 					+ le.blockPosition().getY() + ","
 					+ le.blockPosition().getZ() + "): " + dMsg);
-//		}
+		}
 
 	}
 
@@ -86,43 +88,18 @@ public class Utility {
 
 	}
 
-	public static void updateEffect(LivingEntity e, int amplifier, MobEffect mobEffect, int duration) {
-		MobEffectInstance ei = e.getEffect(mobEffect);
-		if (amplifier == 10) {
-			amplifier = 20; // player "plaid" speed.
-		}
-		if (ei != null) {
-			if (amplifier > ei.getAmplifier()) {
-				e.removeEffect(mobEffect);
-			}
-			if (amplifier == ei.getAmplifier() && ei.getDuration() > 10) {
-				return;
-			}
-			if (ei.getDuration() > 10) {
-				return;
-			}
-			e.removeEffect(mobEffect);
-		}
-		e.addEffect(new MobEffectInstance(mobEffect, duration, amplifier, true, true));
-		return;
-	}
-
 
 	public static void setName(ItemStack stack, String inString)
 	{
-		CompoundTag tag = stack.getOrCreateTagElement("display");
-		ListTag list = new ListTag();
-		list.add(StringTag.valueOf(inString));
-		tag.put("Name", list);
+		stack.set(DataComponents.CUSTOM_NAME, Component.literal(inString));
 	}
 	
 	
 	public static void setLore(ItemStack stack, String inString)
 	{
-		CompoundTag tag = stack.getOrCreateTagElement("display");
-		ListTag list = new ListTag();
-		list.add(StringTag.valueOf(inString));
-		tag.put("Lore", list);
+		List<Component> list = new ArrayList<>();
+		list.add(Component.literal(inString));
+		stack.set(DataComponents.LORE, new ItemLore(list));
 	}
 	
 	public static boolean isNotNearWebs(BlockPos pos, ServerLevel serverLevel) {

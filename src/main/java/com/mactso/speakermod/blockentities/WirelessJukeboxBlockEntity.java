@@ -3,64 +3,70 @@ package com.mactso.speakermod.blockentities;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Nullable;
-
 import com.mactso.speakermod.block.WirelessSpeakerBlock;
 import com.mactso.speakermod.config.MyConfig;
 import com.mactso.speakermod.init.BlockEntityInit;
+import com.mactso.speakermod.utilities.Utility;
 import com.mojang.blaze3d.audio.Channel;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.game.ClientboundLevelEventPacket;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.JukeboxSong;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DaylightDetectorBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
-public class WirelessJukeboxBlockEntity extends BlockEntity  {
+public class WirelessJukeboxBlockEntity extends BlockEntity {
 	// DaylightDetectorBlock look at this as example.
+	static final int SUNRISE = 1001;
+	static final int SUNSET = 13001;
 	List<BlockPos> speakers = new ArrayList<>();
-	Channel ss = null;
-	int discId = -1;
+	Channel soundSource = null;
+	public int NO_SONG = -1;
+	private int songId = NO_SONG;
 	int countdown = 0;
 	boolean needsSave = false;
 	static final ItemStack EMERALD_STACK = new ItemStack(Items.EMERALD, 1);
 	static final ItemParticleOption EMERALD_PARTICLE = new ItemParticleOption(ParticleTypes.ITEM, EMERALD_STACK);
-	
+
 	public WirelessJukeboxBlockEntity(BlockPos worldPosition, BlockState blockState) {
-	      super(BlockEntityInit.WIRELESS_JUKEBOX.get(), worldPosition, blockState);
+		super(BlockEntityInit.WIRELESS_JUKEBOX.get(), worldPosition, blockState);
 	}
 
-	public int getDiscId ( ) {
-		return this.discId;
+	public int getSongId() {
+		return this.songId;
 	}
-	
-	public boolean addSpeakerPos (BlockPos pos) {
-		
+
+	public boolean addSpeakerPos(BlockPos pos) {
+
 		doSpeakerValidation();
 		speakers.remove(pos);
 		if (speakers.size() < 3) {
-			MyConfig.debugMsg(1, pos, "JukeBox Adding Speaker");
+			Utility.debugMsg(1, pos, "JukeBox Adding Speaker");
 			speakers.add(pos);
 		} else {
 			return false;
 		}
 		this.needsSave = true;
-		
+
 		return true;
 	}
 
 	public void doSpeakerValidation() {
-		if (level == null) 
+		if (level == null)
 			return;
 		List<BlockPos> badSpeakers = new ArrayList<>();
 		for (BlockPos spkPos : speakers) {
@@ -70,238 +76,282 @@ public class WirelessJukeboxBlockEntity extends BlockEntity  {
 		}
 		speakers.removeAll(badSpeakers);
 	}
-	
+
 	@Override
 	// save state when chunk unloads
-	// this sucks and I should redo with something like https://forums.minecraftforge.net/topic/60302-any-solved-saving-nbt-data/
-	
-	public void saveAdditional(CompoundTag compound) {
-		// from jukeboxblock code ...  CompoundNBT compoundnbt = stack.getOrCreateTag();
-		MyConfig.setDebugLevel(0);  // TODO set back to 0
-		MyConfig.debugMsg(1, worldPosition, "Jukebox Saving Speakers");
+	// this sucks and I should redo with something like
+	// https://forums.minecraftforge.net/topic/60302-any-solved-saving-nbt-data/
+	public void saveAdditional(CompoundTag compound, Provider provider) {
+		// from jukeboxblock code ... CompoundNBT compoundnbt = stack.getOrCreateTag();
+		// MyConfig.setDebugLevel(0); // TODO set back to 0
+		Utility.debugMsg(1, worldPosition, "Jukebox Saving Speakers");
 		if (speakers.size() > 0) {
 
-			if (speakers.size()>0) {
+			if (speakers.size() > 0) {
 				compound.putInt("spkr0x", speakers.get(0).getX());
 				compound.putInt("spkr0y", speakers.get(0).getY());
 				compound.putInt("spkr0z", speakers.get(0).getZ());
-				MyConfig.debugMsg(1, speakers.get(0), "Saving #0 Speaker");
 			}
-	
-			if (speakers.size()>1) {
+
+			if (speakers.size() > 1) {
 				compound.putInt("spkr1x", speakers.get(1).getX());
 				compound.putInt("spkr1y", speakers.get(1).getY());
 				compound.putInt("spkr1z", speakers.get(1).getZ());
-				MyConfig.debugMsg(1, speakers.get(1), "Saving #1 Speaker");
 			}
-	
+
 			if (speakers.size() > 2) {
 				compound.putInt("spkr2x", speakers.get(2).getX());
 				compound.putInt("spkr2y", speakers.get(2).getY());
 				compound.putInt("spkr2z", speakers.get(2).getZ());
-				MyConfig.debugMsg(1, speakers.get(2), "Saving #2 Speaker");
 			}
 
 		}
-		
-		compound.putInt("discId", this.discId);
-		MyConfig.debugMsg(1, "Saving discId " + discId);
-		MyConfig.setDebugLevel(0); // TODO comment out.
 
-		super.saveAdditional(compound);
+		compound.putInt("discId", this.songId);
+		Utility.debugMsg(1, "Saving discId " + songId);
+
+		super.saveAdditional(compound, provider);
 	}
-	
 
 	// restore state when chunk reloads
+
 	@Override
-	public void load(CompoundTag compound) {
-		int x,y,z;
-		super.load(compound);
-		MyConfig.setDebugLevel(0); // TODO set back to 0
-		MyConfig.debugMsg(1, "Restoring Speakers");
+	protected void loadAdditional(CompoundTag compound, Provider provider) {
+		int x, y, z;
+		super.loadAdditional(compound, provider);
+		Utility.debugMsg(1, "Restoring Speakers");
 		speakers.clear();
 
 		x = compound.getInt("spkr0x");
 		y = compound.getInt("spkr0y");
 		z = compound.getInt("spkr0z");
-		BlockPos speakerPos = new BlockPos (x,y,z);
+		BlockPos speakerPos = new BlockPos(x, y, z);
 		if (!speakerPos.equals(BlockPos.ZERO)) {
-			addSpeakerPos (speakerPos);
-			MyConfig.debugMsg(1, speakerPos, "Loading #0 Speaker");
+			addSpeakerPos(speakerPos);
+			Utility.debugMsg(1, speakerPos, "Loading #0 Speaker");
 		}
 
 		x = compound.getInt("spkr1x");
 		y = compound.getInt("spkr1y");
 		z = compound.getInt("spkr1z");
-		speakerPos = new BlockPos (x,y,z);
+		speakerPos = new BlockPos(x, y, z);
 		if (!speakerPos.equals(BlockPos.ZERO)) {
-			addSpeakerPos (speakerPos);
-			MyConfig.debugMsg(1, speakerPos, "Loading #1 Speaker");
+			addSpeakerPos(speakerPos);
+			Utility.debugMsg(1, speakerPos, "Loading #1 Speaker");
 		}
 
 		x = compound.getInt("spkr2x");
 		y = compound.getInt("spkr2y");
 		z = compound.getInt("spkr2z");
-		speakerPos = new BlockPos (x,y,z);
+		speakerPos = new BlockPos(x, y, z);
 		if (!speakerPos.equals(BlockPos.ZERO)) {
-			addSpeakerPos (speakerPos);
-			MyConfig.debugMsg(1, speakerPos, "Restoring #2 Speaker");
+			addSpeakerPos(speakerPos);
+			Utility.debugMsg(1, speakerPos, "Restoring #2 Speaker");
 		}
-		
-		this.discId = compound.getInt("discId");
-		MyConfig.debugMsg(1, "Loading discId " + discId);
-		MyConfig.setDebugLevel(0); // TODO remove this
+
+		this.songId = compound.getInt("discId");
+		Utility.debugMsg(1, "Loading discId " + songId);
 
 	}
-	
-	public void playEvent(ServerLevel sw, @Nullable Player player, int type, BlockPos pos, int data) {
-	      sw.getServer().getPlayerList().broadcast(player, (double)pos.getX(), (double)pos.getY(), (double)pos.getZ(), 96.0D, sw.dimension(), new ClientboundLevelEventPacket(type, pos, data, false));
-	   }
-	
-	// starts speakers and validates they are still in place.
-	public void startSpeakers(int discId) {
 
-		this.discId = discId;
+	public void startWirelessJukeBox(ServerLevel sLevel, Holder<JukeboxSong> songHolderIn) {
+		Utility.debugMsg(1, this.worldPosition, "Start New Song at JukeBox");
+		spawnMusicParticles(sLevel, this.worldPosition);
+		this.songId = sLevel.registryAccess().registryOrThrow(Registries.JUKEBOX_SONG).getId(songHolderIn.value());
+		playEvent(sLevel, songId, this.worldPosition);
+		startWirelessSpeakers(sLevel);
+	}
+
+	public void startWirelessJukeBox(ServerLevel sLevel) {
+		Utility.debugMsg(1, this.worldPosition, "Start Song at JukeBox");
+		spawnMusicParticles(sLevel, this.worldPosition);
+		playEvent(sLevel, this.songId, this.worldPosition);
+		startWirelessSpeakers(sLevel);
+
+	}
+
+	public void stopWirelessJukebox(ServerLevel sLevel) {
+		Utility.debugMsg(1, this.worldPosition, "Stop Song at JukeBox");
+		sLevel.levelEvent(1011, this.worldPosition, 0);
+		stopWirelessSpeakers(sLevel);
+	}
+
+	// starts speakers and validates they are still in place.
+	public void startWirelessSpeakers(ServerLevel sLevel) {
+
 		doSpeakerValidation();
 		if (speakers.size() > 0) {
 			for (BlockPos spkPos : speakers) {
-				MyConfig.debugMsg(1, spkPos, "Start Song at Speaker");
-				playEvent((ServerLevel) level, (Player) null, 1010, spkPos, discId);
+				Utility.debugMsg(1, spkPos, "Start Song at Speaker");
+				spawnMusicParticles(sLevel, spkPos);
+				playEvent(sLevel, this.songId, spkPos);
 			}
 		}
-		countdown = getDiscDuration(discId) * 20;
+		countdown = getDiscDuration(this.songId) * 20;
 	}
 
-	public int getDiscDuration (int discId) {
-		int index = discId;
-		if (index == 1027) 
-				return 330;
+	public void stopWirelessSpeakers(ServerLevel sLevel) {
+
+		for (BlockPos spkPos : speakers) {
+			Utility.debugMsg(1, spkPos, "Stopping Song at Speaker");
+			sLevel.levelEvent(1011, spkPos, 0);
+		}
+	}
+
+	public void playEvent(ServerLevel sLevel, int songId, BlockPos pos) {
+		Utility.debugMsg(1, pos, "Playevent songid: " + songId + "  at pos.");
+		sLevel.levelEvent(null, 1010, pos, songId);
+	}
+
+	public int getDiscDuration(int songId) {
+		int index = songId;
+		if (index == 1027)
+			return 330;
 		if (index == 1028)
-				return 330;
-		if ((index >=0) && (index <=15)) {
+			return 330;
+		if ((index >= 0) && (index <= 15)) {
 			return MyConfig.duration[index];
 		}
 		return 240;
 	}
-	public void doLightShow () {
+
+	public void doLightShow() {
 		boolean lightShow = false;
 
-		if (level.getBlockState(worldPosition.below(1)).getBlock() == Blocks.EMERALD_BLOCK) 
+		if (level.getBlockState(worldPosition.below(1)).getBlock() == Blocks.EMERALD_BLOCK)
 			lightShow = true;
-		
-		if (level.getBlockState(worldPosition.below(2)).getBlock() == Blocks.EMERALD_BLOCK) 
-				lightShow = true;
-		
+
+		if (level.getBlockState(worldPosition.below(2)).getBlock() == Blocks.EMERALD_BLOCK)
+			lightShow = true;
+
 		if (lightShow) {
 			doOneLightShowParticleSet(level, worldPosition);
-	 		if (speakers.size()>0) {
+			if (speakers.size() > 0) {
 				for (BlockPos spkPos : speakers) {
-					MyConfig.debugMsg(1, spkPos, "Confirming still Speaker");
+					Utility.debugMsg(1, spkPos, "Confirming still Speaker");
 					if (level.getBlockState(spkPos).getBlock() instanceof WirelessSpeakerBlock) {
-						MyConfig.debugMsg(1, spkPos, "Doing Speaker Light Show");
+						Utility.debugMsg(1, spkPos, "Doing Speaker Light Show");
 						doOneLightShowParticleSet(level, spkPos);
 					}
 				}
-	 		}
+			}
 		}
 	}
 
 	private void doOneLightShowParticleSet(Level cw, BlockPos pos) {
 		for (int i = 0; i < 5; i++) {
-			double xSpeed = 0.33  * (level.getRandom().nextDouble() -0.4999);
-			double ySpeed = 0.44  * level.getRandom().nextDouble();
-			double zSpeed = 0.33  * (level.getRandom().nextDouble() -0.4999);
-			double x = pos.getX()+0.5f;
-			double y = pos.getY()+1.5f;
-			double z = pos.getZ()+0.5f;
-			cw.addParticle(EMERALD_PARTICLE, x, y, z, xSpeed, ySpeed, zSpeed);			
+			double xSpeed = 0.33 * (level.getRandom().nextDouble() - 0.4999);
+			double ySpeed = 0.44 * level.getRandom().nextDouble();
+			double zSpeed = 0.33 * (level.getRandom().nextDouble() - 0.4999);
+			double x = pos.getX() + 0.5f;
+			double y = pos.getY() + 1.5f;
+			double z = pos.getZ() + 0.5f;
+			cw.addParticle(EMERALD_PARTICLE, x, y, z, xSpeed, ySpeed, zSpeed);
 		}
 	}
-	
-	public void stopSpeakers () {
 
-		this.discId = -1;
-		this.ss = null;
-		
-		for (BlockPos spkPos : speakers) {
-			playEvent((ServerLevel) level, (Player) null, 1010, spkPos, discId);
-		}
-	}
-	
 	public static void serverTick(Level level, BlockPos pos, BlockState state, WirelessJukeboxBlockEntity blockEntity) {
 		blockEntity.realServerTick();
 	}
-	
 
 	public void realServerTick() {
 
-		long timer = level.getGameTime()%20;
-		
+		long timer = level.getGameTime() % 20;
+
 		if (countdown > 0)
 			countdown--;
 //		if ((countdown>0) && (timer == 1)) {
-//			MyConfig.debugMsg(0, worldPosition, "lightshow " + countdown);
+//			Utility.debugMsg(1, worldPosition, "lightshow " + countdown);
 //			doLightShow();
 //		}		
-		// NOTE this is on the client side)  // remove test on ticker
-		if (this.ss != null) {
-			if (ss.stopped()) {
-				MyConfig.debugMsg(1, worldPosition, "Sound Event Stopped");
-				ss=null;
-			} else if (timer == 1) {
-				if (countdown>0) {
-					MyConfig.debugMsg(0, worldPosition, "lightshow " + countdown);
-				}
-//				doLightShow();
-			}
-		}
+		// NOTE this is on the client side) // remove test on ticker
 
-		if ((discId != -1) && !(level.isClientSide)) {
-			long gameTime = level.getDayTime() % 24000;
-			Block BlockBelowSpeaker = level.getBlockState(this.worldPosition.below()).getBlock();
-			boolean isInverted = false;
-			if (BlockBelowSpeaker instanceof DaylightDetectorBlock) {
-				isInverted = level.getBlockState(this.worldPosition.below()).getValue(DaylightDetectorBlock.INVERTED);
-			}
-			
-			if (gameTime == 1001) {
-				if (BlockBelowSpeaker == Blocks.GLOWSTONE ) {
-					startSpeakers(discId);
-					this.playEvent((ServerLevel) level, (Player) null, 1010, worldPosition, discId);
-				}
-				if ((BlockBelowSpeaker == Blocks.DAYLIGHT_DETECTOR ) && (!isInverted)) {
-					startSpeakers(discId);
-					this.playEvent((ServerLevel) level, (Player) null, 1010, worldPosition, discId);
-				}
-			}
-			if (gameTime == 13001) {
-				if (BlockBelowSpeaker == Blocks.COAL_BLOCK ) {
-					startSpeakers(discId);
-					this.playEvent((ServerLevel) level, (Player) null, 1010, worldPosition, discId);
-					}
-				if ((BlockBelowSpeaker == Blocks.DAYLIGHT_DETECTOR ) && (isInverted)) {
-					startSpeakers(discId);
-					this.playEvent((ServerLevel) level, (Player) null, 1010, worldPosition, discId);
-				}
+		ServerLevel sLevel = (ServerLevel) level;
+		playOptionalSunriseSunsetMusic(sLevel);
 
-			}
-
-		}
-		
 		if (needsSave) {
 			this.setChanged();
 			needsSave = false;
 		}
 	}
 
-	public void setSoundSource(Channel source) {
-		this.ss = source;
+	private void playOptionalSunriseSunsetMusic(ServerLevel sLevel) {
+
+		if (level.isClientSide())
+			return;
+
+		if (this.songId == NO_SONG)
+			return;
+
+		long dayTime = sLevel.getDayTime() % 24000;
+		if ((dayTime != SUNRISE) && (dayTime != SUNSET))
+			return;
+int x =3;
+		Block blockBelowSpeaker = level.getBlockState(this.worldPosition.below()).getBlock();
+		playSunriseMusic(sLevel, blockBelowSpeaker);
+		playSunsetMusic(sLevel, blockBelowSpeaker);
+
 	}
 
-	public void setDiscId(int discId) {
-		this.discId = discId;
-		needsSave = true;
-		
+	private void playSunriseMusic(ServerLevel sLevel, Block blockBelowSpeaker) {
+		if (sLevel.getDayTime() != SUNRISE)
+			return;
+
+		if (blockBelowSpeaker != Blocks.GLOWSTONE)
+			return;
+
+		boolean isInverted = false;
+		if (blockBelowSpeaker instanceof DaylightDetectorBlock) {
+			isInverted = level.getBlockState(this.worldPosition.below()).getValue(DaylightDetectorBlock.INVERTED);
+		}
+
+		if ((blockBelowSpeaker == Blocks.DAYLIGHT_DETECTOR) && (isInverted))
+			return;
+
+		startWirelessJukeBox(sLevel);
+		return;
 	}
-	
+
+	private void playSunsetMusic(ServerLevel sLevel, Block blockBelowSpeaker) {
+
+		if (sLevel.getDayTime() != SUNSET)
+			return;
+		Utility.debugMsg(1, "it's sunset");
+		if (blockBelowSpeaker != Blocks.COAL_BLOCK)
+			return;
+
+		boolean isInverted = false;
+		if (blockBelowSpeaker instanceof DaylightDetectorBlock) {
+			isInverted = level.getBlockState(this.worldPosition.below()).getValue(DaylightDetectorBlock.INVERTED);
+		}
+		if ((blockBelowSpeaker == Blocks.DAYLIGHT_DETECTOR) && (!isInverted))
+			return;
+		startWirelessJukeBox(sLevel);
+		return;
+	}
+
+	private static void spawnMusicParticles(LevelAccessor p_343992_, BlockPos p_342425_) {
+		if (p_343992_ instanceof ServerLevel serverlevel) {
+			Vec3 vec3 = Vec3.atBottomCenterOf(p_342425_).add(0.0, 1.2F, 0.0);
+			float f = (float) p_343992_.getRandom().nextInt(4) / 24.0F;
+			serverlevel.sendParticles(ParticleTypes.NOTE, vec3.x(), vec3.y(), vec3.z(), 0, (double) f, 0.0, 0.0, 1.0);
+		}
+	}
+
+	public void setSoundSource(Channel source) {
+		Utility.debugMsg(1, "soundsource set to " + source.toString());
+		this.soundSource = source;
+	}
+
+	public void setSongId(int songId) {
+		this.songId = songId;
+		this.setChanged();
+	}
+
+	public void forgetSong() {
+		this.songId = NO_SONG;
+
+		this.setChanged();
+	}
+
 }
